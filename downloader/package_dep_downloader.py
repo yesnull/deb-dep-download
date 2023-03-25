@@ -38,13 +38,23 @@ retry_options = {
 class PackageDepDownloader:
 
     def __init__(self, top_level_package):
-        self.apt_list = self.generate_installed_list()
+        self.apt_list = self.generate_installed_list() # TODO
+
         self.package = top_level_package
         self.package_list = set()
+
+        # create /deb_packages dir if needed
+        pkg_dir_path = os.path.join(os.getcwd(), PACKAGE_DIRECTORY)
+        if not (os.path.exists(pkg_dir_path) and os.path.isdir(pkg_dir_path)):
+            os.makedirs(pkg_dir_path, 0o777)
+
+        # now create top level package dir
         deb_pkg_path = os.path.join(os.getcwd(), PACKAGE_DIRECTORY, self.package)
         self.deb_pkg_path = str(deb_pkg_path)
-        if os.path.exists(deb_pkg_path) and os.path.isdir(deb_pkg_path):
+
+        if os.path.exists(deb_pkg_path) and os.path.isdir(deb_pkg_path):  # remove duplicate pkg dir
             shutil.rmtree(deb_pkg_path)
+
         os.makedirs(deb_pkg_path, 0o777)
 
     def generate_installed_list(self):
@@ -239,14 +249,3 @@ class PackageDepDownloader:
                 continue
         return False
     ##### ----- End package downloading
-
-
-# cpp_trawler = PackageDepDownloader("cpp")
-# cpp_trawler.find_all_packages_needed()
-# # print(cpp_trawler.package_list)
-# for package in cpp_trawler.package_list:
-#     package_downloaded_successfully = cpp_trawler.download_deb_package(package)
-#     if not package_downloaded_successfully:
-#         LOGGER.warning(f"Unable to download package: {package}")
-# # trawler.download_deb_package("libstdc++6")
-# # download_deb_package(package_name, distro_name, arch_name)
